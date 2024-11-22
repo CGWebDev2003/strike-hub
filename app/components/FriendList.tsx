@@ -1,13 +1,4 @@
-import * as React from "react";
-import {
-	FolderRegular,
-	EditRegular,
-	OpenRegular,
-	DocumentRegular,
-	PeopleRegular,
-	DocumentPdfRegular,
-	VideoRegular,
-} from "@fluentui/react-icons";
+import React, { useEffect, useState } from "react";
 import {
 	TableBody,
 	TableCell,
@@ -16,8 +7,6 @@ import {
 	TableHeader,
 	TableHeaderCell,
 	TableCellLayout,
-	PresenceBadgeStatus,
-	Avatar,
 } from "@fluentui/react-components";
 import { makeStyles } from "@fluentui/react-components";
 
@@ -27,59 +16,56 @@ const useStyles = makeStyles({
 	},
 });
 
-// const items = [
-// 	{
-// 		file: { label: "Meeting notes", icon: <DocumentRegular /> },
-// 		author: { label: "Max Mustermann", status: "available" },
-// 		lastUpdated: { label: "7h ago", timestamp: 1 },
-// 		lastUpdate: {
-// 			label: "You edited this",
-// 			icon: <EditRegular />,
-// 		},
-// 	},
-// 	{
-// 		file: { label: "Thursday presentation", icon: <FolderRegular /> },
-// 		author: { label: "Erika Mustermann", status: "busy" },
-// 		lastUpdated: { label: "Yesterday at 1:45 PM", timestamp: 2 },
-// 		lastUpdate: {
-// 			label: "You recently opened this",
-// 			icon: <OpenRegular />,
-// 		},
-// 	},
-// 	{
-// 		file: { label: "Training recording", icon: <VideoRegular /> },
-// 		author: { label: "John Doe", status: "away" },
-// 		lastUpdated: { label: "Yesterday at 1:45 PM", timestamp: 2 },
-// 		lastUpdate: {
-// 			label: "You recently opened this",
-// 			icon: <OpenRegular />,
-// 		},
-// 	},
-// 	{
-// 		file: { label: "Purchase order", icon: <DocumentPdfRegular /> },
-// 		author: { label: "Jane Doe", status: "offline" },
-// 		lastUpdated: { label: "Tue at 9:30 AM", timestamp: 3 },
-// 		lastUpdate: {
-// 			label: "You shared this in a Teams chat",
-// 			icon: <PeopleRegular />,
-// 		},
-// 	},
-// ];
+type Friend = {
+	id: number;
+	lastname: string;
+	firstname: string;
+	email: string;
+	phone: string | null;
+	strikes: number;
+};
 
 const columns = [
-	{ columnKey: "file", label: "Lastname" },
-	{ columnKey: "author", label: "Firstname" },
-	{ columnKey: "lastUpdated", label: "Email" },
-	{ columnKey: "lastUpdate", label: "Phone" },
-	{ columnKey: "lastUpdatwfe", label: "Strikes" },
+	{ columnKey: "lastname", label: "Lastname" },
+	{ columnKey: "firstname", label: "Firstname" },
+	{ columnKey: "email", label: "Email" },
+	{ columnKey: "phone", label: "Phone" },
+	{ columnKey: "strikes", label: "Strikes" },
 ];
 
 const FriendList = () => {
 	const classes = useStyles();
+	const [friends, setFriends] = useState<Friend[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const fetchFriends = async () => {
+			try {
+				const response = await fetch("/api/friends");
+				if (!response.ok) {
+					throw new Error(`Error: ${response.statusText}`);
+				}
+				const data: Friend[] = await response.json();
+				setFriends(data);
+			} catch (err: any) {
+				setError(err.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchFriends();
+	}, []);
+
+	if (loading) return <p>Loading...</p>;
+	if (error) return <p>Error: {error}</p>;
 
 	return (
 		<div className={classes.friendListTable}>
-			<Table arial-label="Default table" style={{ minWidth: "510px" }}>
+			<Table
+				aria-label="Friends List Table"
+				style={{ minWidth: "510px" }}>
 				<TableHeader>
 					<TableRow>
 						{columns.map((column) => (
@@ -90,36 +76,35 @@ const FriendList = () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{/* {items.map((item) => (
-						<TableRow key={item.file.label}>
+					{friends.map((friend) => (
+						<TableRow key={friend.id}>
 							<TableCell>
-								<TableCellLayout media={item.file.icon}>
-									{item.file.label}
+								<TableCellLayout>
+									{friend.lastname}
 								</TableCellLayout>
 							</TableCell>
 							<TableCell>
-								<TableCellLayout
-									media={
-										<Avatar
-											aria-label={item.author.label}
-											name={item.author.label}
-											badge={{
-												status: item.author
-													.status as PresenceBadgeStatus,
-											}}
-										/>
-									}>
-									{item.author.label}
+								<TableCellLayout>
+									{friend.firstname}
 								</TableCellLayout>
 							</TableCell>
-							<TableCell>{item.lastUpdated.label}</TableCell>
 							<TableCell>
-								<TableCellLayout media={item.lastUpdate.icon}>
-									{item.lastUpdate.label}
+								<TableCellLayout>
+									{friend.email}
+								</TableCellLayout>
+							</TableCell>
+							<TableCell>
+								<TableCellLayout>
+									{friend.phone}
+								</TableCellLayout>
+							</TableCell>
+							<TableCell>
+								<TableCellLayout>
+									{friend.strikes}
 								</TableCellLayout>
 							</TableCell>
 						</TableRow>
-					))} */}
+					))}
 				</TableBody>
 			</Table>
 		</div>

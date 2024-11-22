@@ -18,17 +18,74 @@ const useStyles = makeStyles({
 	dialogText: {
 		marginBottom: "1rem",
 	},
+	dialogButtonBox: {
+		position: "relative",
+		marginTop: "1rem",
+	},
 });
 
 const FriendFormDialog = () => {
-	function addFriend() {
-		console.log("Add Friend");
+	const classes = useStyles();
+	const [formData, setFormData] = React.useState({
+		firstname: "",
+		lastname: "",
+		email: "",
+		phone: "",
+		strikes: 0,
+	});
+	const [error, setError] = React.useState<string | null>(null);
+	const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+
+	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+		const { name, value } = event.target;
+		setFormData((prev) => ({
+			...prev,
+			[name]: name === "strikes" ? parseInt(value, 10) || 0 : value,
+		}));
+	}
+
+	async function addFriend() {
+		try {
+			const response = await fetch("/api/friends", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(formData),
+			});
+
+			if (!response.ok) {
+				throw new Error(await response.text());
+			}
+
+			const newFriend = await response.json();
+			console.log("Friend added successfully:", newFriend);
+
+			// Reset form data
+			setFormData({
+				firstname: "",
+				lastname: "",
+				email: "",
+				phone: "",
+				strikes: 0,
+			});
+
+			// Close the dialog
+			setIsDialogOpen(false);
+		} catch (err: any) {
+			setError(`Failed to add friend: ${err.message}`);
+		}
 	}
 
 	return (
-		<Dialog>
+		<Dialog
+			open={isDialogOpen}
+			onOpenChange={(event, data) => setIsDialogOpen(data.open)}>
 			<DialogTrigger disableButtonEnhancement>
-				<Button size="large" appearance="primary">
+				<Button
+					size="large"
+					appearance="primary"
+					onClick={() => setIsDialogOpen(true)}>
 					Add Friend
 				</Button>
 			</DialogTrigger>
@@ -36,14 +93,18 @@ const FriendFormDialog = () => {
 				<DialogBody>
 					<DialogTitle>Add a new friend</DialogTitle>
 					<DialogContent>
-						<p className="dialogText">
-							Add new friends here to track their strikes.
-						</p>
-						<NewFriendForm></NewFriendForm>
+						<NewFriendForm
+							formData={formData}
+							onChange={handleInputChange}
+						/>
 					</DialogContent>
-					<DialogActions>
+					<DialogActions className={classes.dialogButtonBox}>
 						<DialogTrigger disableButtonEnhancement>
-							<Button size="large">Close</Button>
+							<Button
+								size="large"
+								onClick={() => setIsDialogOpen(false)}>
+								Close
+							</Button>
 						</DialogTrigger>
 						<Button
 							size="large"
@@ -52,6 +113,7 @@ const FriendFormDialog = () => {
 							Add Friend
 						</Button>
 					</DialogActions>
+					{error && <p style={{ color: "red" }}>{error}</p>}
 				</DialogBody>
 			</DialogSurface>
 		</Dialog>
