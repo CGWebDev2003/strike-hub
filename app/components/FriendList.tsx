@@ -3,6 +3,7 @@ import {
 	AddRegular,
 	DeleteRegular,
 	PersonAvailableRegular,
+	PersonLightningRegular,
 	PersonSubtractRegular,
 	PersonWarningRegular,
 	SubtractRegular,
@@ -46,6 +47,11 @@ const useStyles = makeStyles({
 	},
 	deleteButton: {
 		position: "relative",
+	},
+	actionButtonBox: {
+		position: "relative",
+		display: "flex",
+		gap: ".5rem",
 	},
 });
 
@@ -107,7 +113,6 @@ const FriendList = () => {
 			}
 			const updatedFriend: Friend = await response.json();
 
-			// Aktualisiere den Zustand
 			setFriends((prevFriends) =>
 				prevFriends.map((friend) =>
 					friend.id === id ? updatedFriend : friend
@@ -136,7 +141,6 @@ const FriendList = () => {
 			if (!response.ok) {
 				throw new Error(`Error: ${response.statusText}`);
 			}
-			// Aktualisiere die Liste der Freunde nach erfolgreichem Löschen
 			setFriends((prevFriends) =>
 				prevFriends.filter((friend) => friend.id !== id)
 			);
@@ -245,13 +249,26 @@ const FriendList = () => {
 							</TableCell>
 							<TableCell>
 								<TableCellLayout>
-									<Button
-										className={classes.deleteButton}
-										shape="circular"
-										icon={<DeleteRegular />}
-										onClick={() => deleteFriend(friend.id)}>
-										Delete
-									</Button>
+									<div className={classes.actionButtonBox}>
+										<Button
+											className={classes.deleteButton}
+											shape="circular"
+											icon={<DeleteRegular />}
+											onClick={() =>
+												deleteFriend(friend.id)
+											}>
+											Unfriend
+										</Button>
+										<Button
+											className={classes.deleteButton}
+											shape="circular"
+											icon={<PersonLightningRegular />}
+											onClick={() =>
+												deleteFriend(friend.id)
+											}>
+											Deadly Enemy
+										</Button>
+									</div>
 								</TableCellLayout>
 							</TableCell>
 						</TableRow>

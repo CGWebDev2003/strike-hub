@@ -67,7 +67,6 @@ const FriendFormDialog = () => {
 			const newFriend = await response.json();
 			console.log("Friend added successfully:", newFriend);
 
-			// Reset form data
 			setFormData({
 				firstname: "",
 				lastname: "",

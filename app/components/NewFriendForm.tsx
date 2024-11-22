@@ -1,6 +1,5 @@
 import * as React from "react";
 
-import type { FieldProps } from "@fluentui/react-components";
 import { Field, Input } from "@fluentui/react-components";
 
 type Props = {
