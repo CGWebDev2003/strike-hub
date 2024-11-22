@@ -88,6 +88,41 @@ const FriendList = () => {
 		fetchFriends();
 	}, []);
 
+	const updateStrikes = async (id: number, newStrikes: number) => {
+		try {
+			const response = await fetch(`/api/friends/${id}`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ strikes: newStrikes }),
+			});
+			if (!response.ok) {
+				throw new Error(`Error: ${response.statusText}`);
+			}
+			const updatedFriend: Friend = await response.json();
+
+			// Aktualisiere den Zustand
+			setFriends((prevFriends) =>
+				prevFriends.map((friend) =>
+					friend.id === id ? updatedFriend : friend
+				)
+			);
+		} catch (err: any) {
+			setError(err.message);
+		}
+	};
+
+	const incrementStrikes = (id: number, currentStrikes: number) => {
+		updateStrikes(id, currentStrikes + 1);
+	};
+
+	const decrementStrikes = (id: number, currentStrikes: number) => {
+		if (currentStrikes > 0) {
+			updateStrikes(id, currentStrikes - 1);
+		}
+	};
+
 	const deleteFriend = async (id: number) => {
 		try {
 			const response = await fetch(`/api/friends/${id}`, {
@@ -152,8 +187,12 @@ const FriendList = () => {
 											<Button
 												className={classes.strikeButton}
 												shape="circular"
-												icon={
-													<SubtractRegular />
+												icon={<SubtractRegular />}
+												onClick={() =>
+													decrementStrikes(
+														friend.id,
+														friend.strikes
+													)
 												}></Button>
 											<p className={classes.strikeNumber}>
 												{friend.strikes}
@@ -161,7 +200,13 @@ const FriendList = () => {
 											<Button
 												className={classes.strikeButton}
 												shape="circular"
-												icon={<AddRegular />}></Button>
+												icon={<AddRegular />}
+												onClick={() =>
+													incrementStrikes(
+														friend.id,
+														friend.strikes
+													)
+												}></Button>
 										</div>
 									</div>
 								</TableCellLayout>

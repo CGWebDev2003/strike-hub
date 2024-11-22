@@ -10,10 +10,9 @@ export async function DELETE(
 	const { id } = params;
 
 	try {
-		// Lösche den Freund anhand der ID
 		const deletedFriend = await prisma.friends.delete({
 			where: {
-				id: Number(id), // Prisma benötigt hier die ID als Zahl
+				id: Number(id),
 			},
 		});
 
@@ -31,6 +30,30 @@ export async function DELETE(
 			{ status: 500 }
 		);
 	} finally {
-		await prisma.$disconnect(); // Verbindung zur Datenbank schließen
+		await prisma.$disconnect();
+	}
+}
+
+export async function PATCH(
+	request: Request,
+	{ params }: { params: { id: string } }
+) {
+	const { id } = params;
+
+	try {
+		const { strikes } = await request.json();
+
+		const updatedFriend = await prisma.friends.update({
+			where: { id: parseInt(id, 10) },
+			data: { strikes },
+		});
+
+		return NextResponse.json(updatedFriend, { status: 200 });
+	} catch (error) {
+		console.error(error);
+		return NextResponse.json(
+			{ error: "Failed to update friend" },
+			{ status: 500 }
+		);
 	}
 }
