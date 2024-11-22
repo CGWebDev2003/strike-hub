@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import {
 	AddRegular,
 	DeleteRegular,
+	PersonAvailableRegular,
+	PersonSubtractRegular,
+	PersonWarningRegular,
 	SubtractRegular,
 } from "@fluentui/react-icons";
 import {
@@ -13,6 +16,7 @@ import {
 	TableHeaderCell,
 	TableCellLayout,
 	Button,
+	Badge,
 } from "@fluentui/react-components";
 import { makeStyles } from "@fluentui/react-components";
 
@@ -55,6 +59,7 @@ type Friend = {
 };
 
 const columns = [
+	{ columnKey: "status", label: "Status" },
 	{ columnKey: "lastname", label: "Lastname" },
 	{ columnKey: "firstname", label: "Firstname" },
 	{ columnKey: "email", label: "Email" },
@@ -140,6 +145,28 @@ const FriendList = () => {
 		}
 	};
 
+	const calculateStatus = (strikes: number) => {
+		const statusGreen = (
+			<Badge size="extra-large" color="success" appearance="tint">
+				<PersonAvailableRegular /> OK
+			</Badge>
+		);
+		const statusYellow = (
+			<Badge size="extra-large" color="warning" appearance="tint">
+				<PersonWarningRegular /> Warning
+			</Badge>
+		);
+		const statusRed = (
+			<Badge size="extra-large" color="severe" appearance="tint">
+				<PersonSubtractRegular /> Escalation
+			</Badge>
+		);
+
+		if (strikes < 2) return statusGreen;
+		if (strikes === 2) return statusYellow;
+		return statusRed;
+	};
+
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
 
@@ -160,6 +187,11 @@ const FriendList = () => {
 				<TableBody>
 					{friends.map((friend) => (
 						<TableRow key={friend.id}>
+							<TableCell>
+								<TableCellLayout>
+									{calculateStatus(friend.strikes)}
+								</TableCellLayout>
+							</TableCell>
 							<TableCell>
 								<TableCellLayout>
 									{friend.lastname}
