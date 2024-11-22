@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
 import {
+	AddRegular,
+	DeleteRegular,
+	SubtractRegular,
+} from "@fluentui/react-icons";
+import {
 	TableBody,
 	TableCell,
 	TableRow,
@@ -7,12 +12,36 @@ import {
 	TableHeader,
 	TableHeaderCell,
 	TableCellLayout,
+	Button,
 } from "@fluentui/react-components";
 import { makeStyles } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
 	friendListTable: {
 		padding: "1rem 2rem",
+	},
+	strikeCell: {
+		width: "100%",
+		display: "flex",
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+	},
+	strikeBox: {
+		position: "relative",
+		display: "flex",
+		gap: ".5rem",
+		alignItems: "center",
+	},
+	strikeButton: {
+		position: "relative",
+	},
+	strikeNumber: {
+		width: "2rem",
+		textAlign: "center",
+	},
+	deleteButton: {
+		position: "relative",
 	},
 });
 
@@ -31,6 +60,7 @@ const columns = [
 	{ columnKey: "email", label: "Email" },
 	{ columnKey: "phone", label: "Phone" },
 	{ columnKey: "strikes", label: "Strikes" },
+	{ columnKey: "actions", label: "Actions" },
 ];
 
 const FriendList = () => {
@@ -100,7 +130,33 @@ const FriendList = () => {
 							</TableCell>
 							<TableCell>
 								<TableCellLayout>
-									{friend.strikes}
+									<div className={classes.strikeCell}>
+										<div className={classes.strikeBox}>
+											<Button
+												className={classes.strikeButton}
+												shape="circular"
+												icon={
+													<SubtractRegular />
+												}></Button>
+											<p className={classes.strikeNumber}>
+												{friend.strikes}
+											</p>
+											<Button
+												className={classes.strikeButton}
+												shape="circular"
+												icon={<AddRegular />}></Button>
+										</div>
+									</div>
+								</TableCellLayout>
+							</TableCell>
+							<TableCell>
+								<TableCellLayout>
+									<Button
+										className={classes.deleteButton}
+										shape="circular"
+										icon={<DeleteRegular />}>
+										Delete
+									</Button>
 								</TableCellLayout>
 							</TableCell>
 						</TableRow>

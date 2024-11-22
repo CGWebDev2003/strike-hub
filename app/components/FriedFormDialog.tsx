@@ -13,6 +13,12 @@ import {
 } from "@fluentui/react-components";
 import NewFriendForm from "./NewFriendForm";
 import { makeStyles } from "@fluentui/react-components";
+import {
+	AddCircleRegular,
+	ChatWarningFilled,
+	CheckmarkCircleRegular,
+	DismissCircleRegular,
+} from "@fluentui/react-icons";
 
 const useStyles = makeStyles({
 	dialogText: {
@@ -70,7 +76,6 @@ const FriendFormDialog = () => {
 				strikes: 0,
 			});
 
-			// Close the dialog
 			setIsDialogOpen(false);
 		} catch (err: any) {
 			setError(`Failed to add friend: ${err.message}`);
@@ -85,6 +90,8 @@ const FriendFormDialog = () => {
 				<Button
 					size="large"
 					appearance="primary"
+					shape="circular"
+					icon={<AddCircleRegular />}
 					onClick={() => setIsDialogOpen(true)}>
 					Add Friend
 				</Button>
@@ -102,18 +109,27 @@ const FriendFormDialog = () => {
 						<DialogTrigger disableButtonEnhancement>
 							<Button
 								size="large"
+								shape="circular"
+								icon={<DismissCircleRegular />}
 								onClick={() => setIsDialogOpen(false)}>
 								Close
 							</Button>
 						</DialogTrigger>
 						<Button
 							size="large"
+							shape="circular"
 							appearance="primary"
+							icon={<CheckmarkCircleRegular />}
 							onClick={addFriend}>
 							Add Friend
 						</Button>
 					</DialogActions>
-					{error && <p style={{ color: "red" }}>{error}</p>}
+					{error && (
+						<p style={{ color: "red" }}>
+							<ChatWarningFilled />
+							{error}
+						</p>
+					)}
 				</DialogBody>
 			</DialogSurface>
 		</Dialog>
