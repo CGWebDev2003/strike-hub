@@ -88,6 +88,23 @@ const FriendList = () => {
 		fetchFriends();
 	}, []);
 
+	const deleteFriend = async (id: number) => {
+		try {
+			const response = await fetch(`/api/friends/${id}`, {
+				method: "DELETE",
+			});
+			if (!response.ok) {
+				throw new Error(`Error: ${response.statusText}`);
+			}
+			// Aktualisiere die Liste der Freunde nach erfolgreichem Löschen
+			setFriends((prevFriends) =>
+				prevFriends.filter((friend) => friend.id !== id)
+			);
+		} catch (err: any) {
+			setError(err.message);
+		}
+	};
+
 	if (loading) return <p>Loading...</p>;
 	if (error) return <p>Error: {error}</p>;
 
@@ -154,7 +171,8 @@ const FriendList = () => {
 									<Button
 										className={classes.deleteButton}
 										shape="circular"
-										icon={<DeleteRegular />}>
+										icon={<DeleteRegular />}
+										onClick={() => deleteFriend(friend.id)}>
 										Delete
 									</Button>
 								</TableCellLayout>
